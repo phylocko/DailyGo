@@ -1,0 +1,117 @@
+{{ template "Header" }}
+
+<div class="row g-5">
+  <div class="col-md-6">
+    <h2>IP Info</h2>
+    <p>Data is provided by <a href="http://ipinfo.io">ipinfo.io</a></p>
+    <table class="table">
+        <tr>
+            <th>Value</th>
+            <th>Parameter</th>
+        </tr>
+        {{ if .Ip }}
+        <tr>
+            <td>Your IP address</td>
+            <td>{{ .Ip }}</td>
+        </tr>
+        {{ end }}
+        {{ if .Country }}
+        <tr>
+            <td>Country</td>
+            <td>{{ .Country }}</td>
+        </tr>
+        {{ end }}
+        {{ if .Region }}
+        <tr>
+            <td>Region</td>
+            <td>{{ .Region }}</td>
+        </tr>
+        {{ end }}
+        {{ if .City }}
+        <tr>
+            <td>City</td>
+            <td>{{ .City }}</td>
+        </tr>
+        {{ end }}
+        {{ if .Org }}
+        <tr>
+            <td>Org</td>
+            <td>{{ .Org }}</td>
+        </tr>
+        {{ end }}
+        {{ if .Postal }}
+        <tr>
+            <td>ZIP Code</td>
+            <td>{{ .Postal }}</td>
+        </tr>
+        {{ end }}
+        {{ if .Timezone }}
+        <tr>
+            <td>Timezone</td>
+            <td>{{ .Timezone }}</td>
+        </tr>
+        {{ end }}
+
+        <tr>
+            <td>Is Bogon</td>
+            <td>{{ if .Bogon }}Yes{{ else }}No{{ end }}</td>
+        </tr>
+
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <h3>What is this?</h3>
+    <p>This page make an HTTP request to <a href="http://ipinfo.io">ipinfo.io</a> API and gets your GeoIP data. The data is shown in an HTML template that why it looks so cute.</p>
+
+    <h4>Source code</h3>
+<pre>func InfoView(c *gin.Context) {
+
+    context, err := ipinfo.GetInfo(c.ClientIP())
+    if err != nil {
+        c.HTML(http.StatusOK, "info.html", gin.H{"error": err})
+        return
+    }
+    c.HTML(http.StatusOK, "info.html", context)
+
+}
+
+type IpInfoResponse struct {
+	Ip       string `json:"ip"`
+	City     string `json:"city"`
+	Region   string `json:"region"`
+	Country  string `json:"country"`
+	Loc      string `json:"loc"`
+	Org      string `json:"org"`
+	Postal   string `json:"postal"`
+	Timezone string `json:"timezone"`
+	Bogon    bool   `json:"bogon"`
+}
+
+var httpClient = &http.Client{Timeout: 3 * time.Second}
+
+func GetInfo(ip string) (IpInfoResponse, error) {
+
+	var target IpInfoResponse
+
+	url := fmt.Sprintf("http://ipinfo.io/%s?token=***", ip)
+
+	r, err := httpClient.Get(url)
+	if err != nil {
+		return target, err
+	}
+	defer r.Body.Close()
+
+	err = json.NewDecoder(r.Body).Decode(&target)
+	if err != nil {
+		return target, err
+	}
+
+	return target, nil
+}
+</pre>
+
+</div>
+
+</div>
+{{ template "Footer" }}
