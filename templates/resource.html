@@ -1,0 +1,57 @@
+{{ template "Header" }}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/resources">Domains</a></li>
+        <li class="breadcrumb-item active">{{ .resource.Domain }}</li>
+    </ol>
+</nav>
+
+<div class="row g-5">
+
+  <div class="col-md-12">
+        <form method="post">
+            <h2>
+                Address list
+                <button type="submit" name="action" value="resolve_resource" class="btn btn-outline-primary" style="float: right;">
+                    <i class="bi bi-arrow-clockwise"></i> Resolve
+                </button>
+            </h2>
+        </form>
+    <p><b>{{ .resource.Domain }}</b>'s resolved IP Addresses</p>
+        <input type="hidden" name="actin" value="delete_resource">
+        <table class="table table-hover">
+            <tr>
+                <th>ID</th>
+                <th>IP Address</th>
+                <th>Updated at</th>
+                <th></th>
+            </tr>
+
+            {{ range $key, $ip := .addresses }}
+            <tr>
+                <td>{{ $ip.ID }}</td>
+                <td>{{ $ip.Ip }}</td>
+                <td class="text-muted">{{ $ip.UpdatedAt.Format "2014-01-02" }}</td>
+                <td class="text-end">
+                    <form method="post">
+                        <input type="hidden" name="address_id" value="{{ $ip.ID }}">
+                        <button 
+                            type="submit" 
+                            name="action"
+                            value="delete_address"
+                            class="btn btn-outline-danger btn-sm" 
+                            style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .65rem;">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </form>
+
+            </tr>
+            {{ end }}
+
+    </table>
+  </div>
+
+</div>
+{{ template "Footer" }}
