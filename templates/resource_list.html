@@ -1,0 +1,91 @@
+{{ template "Header" }}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/resources">Domains</a></li>
+    </ol>
+</nav>
+
+<div class="row g-5">
+  <div class="col-md-6">
+    <h2>Domains</h2>
+    <p>You can create or delete resources.</p>
+
+    <table class="table table-hover">
+        <tr>
+            <th>ID</th>
+            <th>Domain name</th>
+            <th class="text-center">Status</th>
+            <th></th>
+        </tr>
+
+        {{ range $key, $resource := .resources }}
+        <tr>
+            <td>{{ $resource.ID }}</td>
+            <td><a href="/resources/{{ $resource.ID }}">{{ $resource.Domain }}</a></td>
+            <td class="text-center">
+                <span class="badge text-bg-light">{{ $resource.Status }}</span>
+            </td>
+            <td class="text-end">
+                <!-- Button trigger modal -->
+                <button 
+                    type="button" 
+                    class="btn btn-outline-secondary btn-sm" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#deleteModal{{ $resource.ID }}"
+                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .65rem;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade text-start" id="deleteModal{{ $resource.ID }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm action</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                        Delete <b>{{ if $resource.Domain}}{{ $resource.Domain }}{{ else }}{{ $resource.ID}}{{ end }}</b> with it's networks?
+                        </div>
+                        <div class="modal-footer">
+                            <form method="post">
+                                <input type="hidden" name="resource_id" value="{{ $resource.ID}}">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-danger" name="action" value="delete_resource">
+                                    <i class="bi bi-trash-fill"></i> Delete
+                                </button>        
+                            </form>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+            </td>
+        </tr>
+        {{ end }}
+
+    </table>
+  </div>
+
+  <div class="col-md-6">
+
+    <h2>What is this?</h2>
+    <p>I played with ORM. This resource list is stored in the SQLite DB and is operated with <a href="https://gorm.io">Gorm</a>.</p>
+
+    <h3 class="mt-4">Add a resource</h3>
+    <p>Add your domain name, it will be stored into a database. 
+        It's IP addresses will be resolved and put into a separate DB table.</p>
+
+        <form method="post">
+
+            <div class="input-group mb-3">
+                <input type="text" name="domain" value="" class="form-control" placeholder="Domain name" required aria-label="Domain name" aria-describedby="button-addon2">
+                <button class="btn btn-primary" name="action" value="create_resource" type="submit">Create</button>
+              </div>
+        </form>
+</div>
+
+</div>
+{{ template "Footer" }}
