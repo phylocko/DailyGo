@@ -2,6 +2,7 @@ package main
 
 import (
 	"dailygo/internal/database"
+	"dailygo/internal/log"
 	"dailygo/internal/models"
 	"dailygo/internal/web/admin"
 	"dailygo/internal/web/api"
@@ -44,7 +45,12 @@ func Migrate() {
 }
 
 func main() {
+	filename := "dailygo.log"
+	logger := log.FileLogger(filename)
+	defer logger.Sync()
+
 	database.CreateConnection()
+
 	runServer()
 
 }

@@ -33,7 +33,7 @@
             <tr>
                 <td>{{ $ip.ID }}</td>
                 <td>{{ $ip.Ip }}</td>
-                <td class="text-muted">{{ $ip.UpdatedAt.Format "2014-01-02" }}</td>
+                <td class="text-muted">{{ $ip.UpdatedAt.Format "2006-01-02" }}</td>
                 <td class="text-end">
                     <form method="post">
                         <input type="hidden" name="address_id" value="{{ $ip.ID }}">
