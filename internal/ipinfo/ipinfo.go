@@ -1,6 +1,7 @@
 package ipinfo
 
 import (
+	"dailygo/internal/log"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -29,6 +30,7 @@ func GetInfo(ip string) (IpInfoResponse, error) {
 
 	r, err := httpClient.Get(url)
 	if err != nil {
+		log.L.Sugar().Warn(err)
 		return target, err
 	}
 	defer r.Body.Close()
