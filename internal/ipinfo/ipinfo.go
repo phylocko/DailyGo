@@ -1,3 +1,6 @@
+/*
+Copyright © 2022 Vladislav Pavkin [phylocko@gmail.com]
+*/
 package ipinfo
 
 import (

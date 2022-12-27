@@ -26,3 +26,29 @@ Configured logging with <a href="https://github.com/uber-go/zap">zap</a>. Tuned 
 ## Day four
 
 Context with timeout is used to limit ipinfo fetching time with an interval of 1 second. Timeout error is handeled correctly and dislayed to a user.
+
+
+## Day five
+
+Learned how to deal with the [Cobra](https://github.com/spf13/cobra). I'm using positional and keyword arguments with hierarchical command logic and validation:
+
+```
+> dailygo 
+Dailygo — a golang learning project.
+
+Usage:
+  dailygo [command]
+
+Available Commands:
+  completion  Generate the autocompletion script
+  help        Help about any command
+  info        Print geoinfo of an IP address
+  initdb      Init a new database
+  runserver   Run the dailygo web server
+
+Flags:
+  -h, --help   help for dailygo
+
+Use "dailygo [command] --help" for more info
+```
+

@@ -1,3 +1,6 @@
+/*
+Copyright © 2022 Vladislav Pavkin [phylocko@gmail.com]
+*/
 package log
 
 import (
@@ -15,7 +18,6 @@ func FileLogger(filename string) *zap.Logger {
 	config.EncodeTime = zapcore.ISO8601TimeEncoder
 
 	fileEncoder := zapcore.NewJSONEncoder(config)
-	consoleEncoder := zapcore.NewConsoleEncoder(config)
 
 	logFile, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
@@ -23,14 +25,9 @@ func FileLogger(filename string) *zap.Logger {
 	}
 
 	logWriter := zapcore.AddSync(logFile)
-	consoleWriter := zapcore.AddSync(os.Stdout)
-
 	logLevel := zap.NewAtomicLevel()
 
-	core := zapcore.NewTee(
-		zapcore.NewCore(fileEncoder, logWriter, logLevel),
-		zapcore.NewCore(consoleEncoder, consoleWriter, logLevel),
-	)
+	core := zapcore.NewCore(fileEncoder, logWriter, logLevel)
 
 	stackOption := zap.AddStacktrace(logLevel)
 	callerOption := zap.AddCaller()
