@@ -22,3 +22,7 @@ Created a Domain/IP database with [gorm](https://gorm.io). Domains are resolved 
 ## Day three
 
 Configured logging with <a href="https://github.com/uber-go/zap">zap</a>. Tuned up logging to&nbsp;both file and stdout, with Caller and Stacktrace options.
+
+## Day four
+
+Context with timeout is used to limit ipinfo fetching time with an interval of 1 second. Timeout error is handeled correctly and dislayed to a user.

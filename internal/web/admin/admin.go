@@ -1,9 +1,11 @@
 package admin
 
 import (
+	"context"
 	"dailygo/internal/database"
 	"dailygo/internal/ipinfo"
 	"dailygo/internal/models"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -22,13 +24,28 @@ func IndexView(c *gin.Context) {
 
 func InfoView(c *gin.Context) {
 
-	context, err := ipinfo.GetInfo(c.ClientIP())
+	info, err := ipinfo.GetInfo(c.ClientIP())
+
+	pageData := gin.H{}
+
 	if err != nil {
-		c.HTML(http.StatusOK, "info.html", gin.H{"error": err})
-		return
+
+		if errors.Is(err, context.DeadlineExceeded) {
+			pageData["error"] = "ipinfo.io connection is timed out"
+			c.HTML(http.StatusOK, "info.html", pageData)
+			return
+
+		} else {
+			pageData["error"] = "Error communicating with ipinfo.io"
+			c.HTML(http.StatusOK, "info.html", pageData)
+			return
+
+		}
+
 	}
 
-	c.HTML(http.StatusOK, "info.html", context)
+	pageData["info"] = info
+	c.HTML(http.StatusOK, "info.html", pageData)
 
 }
 
