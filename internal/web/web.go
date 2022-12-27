@@ -1,16 +1,21 @@
-package main
+/*
+Copyright © 2022 Vladislav Pavkin [phylocko@gmail.com]
+*/
+package web
 
 import (
 	"dailygo/internal/database"
-	"dailygo/internal/log"
 	"dailygo/internal/models"
 	"dailygo/internal/web/admin"
 	"dailygo/internal/web/api"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
 
-func runServer() {
+func RunServer(host string, port int) {
+
+	listen := fmt.Sprintf("%s:%d", host, port)
 	r := gin.Default()
 
 	r.LoadHTMLGlob("templates/*.html")
@@ -32,25 +37,15 @@ func runServer() {
 		adminRoutes.POST("/resources/:id", admin.ResourceView)
 	}
 
-	r.Run()
+	r.Run(listen)
 }
 
 // Migrate creates a database structure.
 // Call it manually if needed.
 func Migrate() {
+
 	database.Db.AutoMigrate(
 		&models.Resource{},
 		&models.IpAddress{},
 	)
-}
-
-func main() {
-	filename := "dailygo.log"
-	logger := log.FileLogger(filename)
-	defer logger.Sync()
-
-	database.CreateConnection()
-
-	runServer()
-
 }
