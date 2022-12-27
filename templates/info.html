@@ -3,61 +3,67 @@
 <div class="row g-5">
   <div class="col-md-6">
     <h2>IP Info</h2>
-    <p>Data is provided by <a href="http://ipinfo.io">ipinfo.io</a></p>
-    <table class="table">
-        <tr>
-            <th>Value</th>
-            <th>Parameter</th>
-        </tr>
-        {{ if .Ip }}
-        <tr>
-            <td>Your IP address</td>
-            <td>{{ .Ip }}</td>
-        </tr>
-        {{ end }}
-        {{ if .Country }}
-        <tr>
-            <td>Country</td>
-            <td>{{ .Country }}</td>
-        </tr>
-        {{ end }}
-        {{ if .Region }}
-        <tr>
-            <td>Region</td>
-            <td>{{ .Region }}</td>
-        </tr>
-        {{ end }}
-        {{ if .City }}
-        <tr>
-            <td>City</td>
-            <td>{{ .City }}</td>
-        </tr>
-        {{ end }}
-        {{ if .Org }}
-        <tr>
-            <td>Org</td>
-            <td>{{ .Org }}</td>
-        </tr>
-        {{ end }}
-        {{ if .Postal }}
-        <tr>
-            <td>ZIP Code</td>
-            <td>{{ .Postal }}</td>
-        </tr>
-        {{ end }}
-        {{ if .Timezone }}
-        <tr>
-            <td>Timezone</td>
-            <td>{{ .Timezone }}</td>
-        </tr>
-        {{ end }}
+    {{ if .error }}
+        <div class="alert alert-danger" role="alert">
+            {{ .error }}
+        </div>
+    {{ else }}
+        <p>Data is provided by <a href="http://ipinfo.io">ipinfo.io</a></p>
+        <table class="table">
+            <tr>
+                <th>Value</th>
+                <th>Parameter</th>
+            </tr>
+            {{ if .info.Ip }}
+            <tr>
+                <td>Your IP address</td>
+                <td>{{ .info.Ip }}</td>
+            </tr>
+            {{ end }}
+            {{ if .info.Country }}
+            <tr>
+                <td>Country</td>
+                <td>{{ .info.Country }}</td>
+            </tr>
+            {{ end }}
+            {{ if .info.Region }}
+            <tr>
+                <td>Region</td>
+                <td>{{ .info.Region }}</td>
+            </tr>
+            {{ end }}
+            {{ if .info.City }}
+            <tr>
+                <td>City</td>
+                <td>{{ .info.City }}</td>
+            </tr>
+            {{ end }}
+            {{ if .info.Org }}
+            <tr>
+                <td>Org</td>
+                <td>{{ .info.Org }}</td>
+            </tr>
+            {{ end }}
+            {{ if .info.Postal }}
+            <tr>
+                <td>ZIP Code</td>
+                <td>{{ .info.Postal }}</td>
+            </tr>
+            {{ end }}
+            {{ if .info.Timezone }}
+            <tr>
+                <td>Timezone</td>
+                <td>{{ .info.Timezone }}</td>
+            </tr>
+            {{ end }}
 
-        <tr>
-            <td>Is Bogon</td>
-            <td>{{ if .Bogon }}Yes{{ else }}No{{ end }}</td>
-        </tr>
+            <tr>
+                <td>Is Bogon</td>
+                <td>{{ if .info.Bogon }}Yes{{ else }}No{{ end }}</td>
+            </tr>
 
-    </table>
+        </table>
+    {{ end }}
   </div>
 
   <div class="col-md-6">
@@ -66,48 +72,27 @@
 
     <h4>Source code</h3>
 <pre>func InfoView(c *gin.Context) {
+    info, err := ipinfo.GetInfo(c.ClientIP())
 
-    context, err := ipinfo.GetInfo(c.ClientIP())
+    pageData := gin.H{}
+
     if err != nil {
-        c.HTML(http.StatusOK, "info.html", gin.H{"error": err})
-        return
+
+        if errors.Is(err, context.DeadlineExceeded) {
+            pageData["error"] = "ipinfo.io connection is timed out"
+            c.HTML(http.StatusOK, "info.html", pageData)
+            return
+
+        } else {
+            pageData["error"] = "Error communicating with ipinfo.io"
+            c.HTML(http.StatusOK, "info.html", pageData)
+            return
+        }
     }
-    c.HTML(http.StatusOK, "info.html", context)
 
-}
+    pageData["info"] = info
+    c.HTML(http.StatusOK, "info.html", pageData)
 
-type IpInfoResponse struct {
-	Ip       string `json:"ip"`
-	City     string `json:"city"`
-	Region   string `json:"region"`
-	Country  string `json:"country"`
-	Loc      string `json:"loc"`
-	Org      string `json:"org"`
-	Postal   string `json:"postal"`
-	Timezone string `json:"timezone"`
-	Bogon    bool   `json:"bogon"`
-}
-
-var httpClient = &http.Client{Timeout: 3 * time.Second}
-
-func GetInfo(ip string) (IpInfoResponse, error) {
-
-	var target IpInfoResponse
-
-	url := fmt.Sprintf("http://ipinfo.io/%s?token=***", ip)
-
-	r, err := httpClient.Get(url)
-	if err != nil {
-		return target, err
-	}
-	defer r.Body.Close()
-
-	err = json.NewDecoder(r.Body).Decode(&target)
-	if err != nil {
-		return target, err
-	}
-
-	return target, nil
 }
 </pre>
 

@@ -1,6 +1,7 @@
 package ipinfo
 
 import (
+	"context"
 	"dailygo/internal/log"
 	"encoding/json"
 	"fmt"
@@ -20,7 +21,7 @@ type IpInfoResponse struct {
 	Bogon    bool   `json:"bogon"`
 }
 
-var httpClient = &http.Client{Timeout: 3 * time.Second}
+var httpClient = &http.Client{}
 
 func GetInfo(ip string) (IpInfoResponse, error) {
 
@@ -28,14 +29,25 @@ func GetInfo(ip string) (IpInfoResponse, error) {
 
 	url := fmt.Sprintf("http://ipinfo.io/%s?token=be6de701410dd8", ip)
 
-	r, err := httpClient.Get(url)
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, time.Second*1)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.L.Sugar().Warn(err)
 		return target, err
 	}
-	defer r.Body.Close()
 
-	err = json.NewDecoder(r.Body).Decode(&target)
+	response, err := httpClient.Do(req)
+
+	if err != nil {
+		log.L.Sugar().Warn(err)
+		return target, err
+	}
+	defer response.Body.Close()
+
+	err = json.NewDecoder(response.Body).Decode(&target)
 	if err != nil {
 		return target, err
 	}
