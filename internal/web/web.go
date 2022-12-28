@@ -23,6 +23,8 @@ func RunServer(host string, port int) {
 	apiRoutes := r.Group("/api")
 	{
 		apiRoutes.GET("/info", api.InfoView)
+		apiRoutes.GET("/info/pb", api.InfoPBView)
+
 	}
 
 	adminRoutes := r.Group("/")

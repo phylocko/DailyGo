@@ -52,3 +52,10 @@ Flags:
 Use "dailygo [command] --help" for more info
 ```
 
+## Day six
+
+Learned how to deal with the protobuf. Return IP geoinfo in a protobuf format at `/api/info/pb/`. 
+Memo:
+1. Write a **proto** file in `proto/ipinfo/ipinfo.proto`
+2. Run `protoc --go_out=. proto/ipinfo/ipinfo.proto`
+3. Import it and use it. Gin has a special method for it!

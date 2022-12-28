@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "proto/ipinfo";
+
+package ipinfo;
+
+message IPInfoData {
+    string ip  = 1;
+    string city = 2;
+    string region = 3;
+    string country = 4;
+    string loc = 5;
+    string org = 6;
+    string postal = 7;
+    string timezone = 8;
+    bool bogon = 9;
+}
